@@ -1,0 +1,581 @@
+{
+  "properties": {
+    "workflow_details": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Workflow Name",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Workflow Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object",
+      "description": "Add information that will help to differentiate this workflow from another.",
+      "title": "Workflow Details"
+    },
+    "time_range": {
+      "additionalProperties": false,
+      "properties": {
+        "since": {
+          "format": "date-time",
+          "title": "Since",
+          "type": "string",
+          "description": "The start time"
+        },
+        "until": {
+          "format": "date-time",
+          "title": "Until",
+          "type": "string",
+          "description": "The end time"
+        },
+        "timezone": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TimezoneInfo"
+            }
+          ],
+          "default": null,
+          "title": "Timezone"
+        }
+      },
+      "required": [
+        "since",
+        "until"
+      ],
+      "type": "object",
+      "description": "Choose the period of time to analyze.",
+      "title": "Time Range"
+    },
+    "tourism_events": {
+      "additionalProperties": false,
+      "properties": {
+        "file_path": {
+          "title": "File Path",
+          "type": "string",
+          "description": "Path to the file to load. Supported formats: .parquet, .geoparquet, .geojson, .json, .gpkg, .csv, .shp"
+        },
+        "layer": {
+          "default": null,
+          "title": "Layer",
+          "type": "string",
+          "description": "Layer name for GeoPackage files (optional, only used for .gpkg files)",
+          "ecoscope:advanced": true
+        }
+      },
+      "required": [
+        "file_path"
+      ],
+      "type": "object",
+      "title": "Load Tourism Events"
+    },
+    "Guest Entry": {
+      "type": "object",
+      "description": "Process guest entry events: categorize, summarize, and chart.",
+      "ecoscope:task_group": true,
+      "properties": {
+        "guest_summary": {
+          "additionalProperties": false,
+          "properties": {
+            "summary_params": {
+              "items": {
+                "$ref": "#/$defs/SummaryParam"
+              },
+              "title": "Summary Params",
+              "type": "array",
+              "description": "The parameters that define how to calculate summary statistics.",
+              "default": [
+                {
+                  "display_name": "Non Resident Adults",
+                  "aggregator": "sum",
+                  "column": "nra"
+                },
+                {
+                  "display_name": "Non Resident Children",
+                  "aggregator": "sum",
+                  "column": "nrc"
+                },
+                {
+                  "display_name": "Non Resident Students",
+                  "aggregator": "sum",
+                  "column": "nrs"
+                },
+                {
+                  "display_name": "Citizen Adults",
+                  "aggregator": "sum",
+                  "column": "ca"
+                },
+                {
+                  "display_name": "Citizen Children",
+                  "aggregator": "sum",
+                  "column": "cc"
+                },
+                {
+                  "display_name": "Citizen Students",
+                  "aggregator": "sum",
+                  "column": "cs"
+                },
+                {
+                  "display_name": "Resident Adults",
+                  "aggregator": "sum",
+                  "column": "ra"
+                },
+                {
+                  "display_name": "Resident Children",
+                  "aggregator": "sum",
+                  "column": "rc"
+                },
+                {
+                  "display_name": "Resident Students",
+                  "aggregator": "sum",
+                  "column": "rs"
+                },
+                {
+                  "display_name": "Narok Adults",
+                  "aggregator": "sum",
+                  "column": "na"
+                },
+                {
+                  "display_name": "Narok Children",
+                  "aggregator": "sum",
+                  "column": "nc"
+                },
+                {
+                  "display_name": "Narok Students",
+                  "aggregator": "sum",
+                  "column": "ns"
+                }
+              ]
+            }
+          },
+          "required": [
+            "summary_params"
+          ],
+          "type": "object",
+          "title": "Summarize Guest Entry"
+        },
+        "guest_group_bar": {
+          "additionalProperties": false,
+          "properties": {
+            "bar_chart_configs": {
+              "items": {
+                "$ref": "#/$defs/BarConfig"
+              },
+              "title": "Bar Chart Configuration",
+              "type": "array",
+              "description": "Bar chart configuration.",
+              "default": [
+                {
+                  "column": "Non Resident Adults",
+                  "agg_func": "sum",
+                  "label": "Non Resident Adults"
+                },
+                {
+                  "column": "Non Resident Children",
+                  "agg_func": "sum",
+                  "label": "Non Resident Children"
+                },
+                {
+                  "column": "Non Resident Students",
+                  "agg_func": "sum",
+                  "label": "Non Resident Students"
+                },
+                {
+                  "column": "Resident Adults",
+                  "agg_func": "sum",
+                  "label": "Resident Adults"
+                },
+                {
+                  "column": "Resident Children",
+                  "agg_func": "sum",
+                  "label": "Resident Children"
+                },
+                {
+                  "column": "Resident Students",
+                  "agg_func": "sum",
+                  "label": "Resident Students"
+                },
+                {
+                  "column": "Citizen Adults",
+                  "agg_func": "sum",
+                  "label": "Citizen Adults"
+                },
+                {
+                  "column": "Citizen Children",
+                  "agg_func": "sum",
+                  "label": "Citizen Children"
+                },
+                {
+                  "column": "Citizen Students",
+                  "agg_func": "sum",
+                  "label": "Citizen Students"
+                },
+                {
+                  "column": "Narok Adults",
+                  "agg_func": "sum",
+                  "label": "Narok Adults"
+                },
+                {
+                  "column": "Narok Children",
+                  "agg_func": "sum",
+                  "label": "Narok Children"
+                },
+                {
+                  "column": "Narok Students",
+                  "agg_func": "sum",
+                  "label": "Narok Students"
+                }
+              ]
+            }
+          },
+          "required": [
+            "bar_chart_configs"
+          ],
+          "type": "object",
+          "title": "Draw Guest Entry by Group Chart"
+        },
+        "guest_gate_bar": {
+          "additionalProperties": false,
+          "properties": {
+            "bar_chart_configs": {
+              "items": {
+                "$ref": "#/$defs/BarConfig"
+              },
+              "title": "Bar Chart Configuration",
+              "type": "array",
+              "description": "Bar chart configuration.",
+              "default": [
+                {
+                  "column": "Paying Guests",
+                  "agg_func": "sum",
+                  "label": "Paying Guests",
+                  "show_label": true
+                },
+                {
+                  "column": "Narok County Government(NCG) Guests",
+                  "agg_func": "sum",
+                  "label": "Narok County Government(NCG) Guests",
+                  "show_label": true
+                }
+              ]
+            }
+          },
+          "required": [
+            "bar_chart_configs"
+          ],
+          "type": "object",
+          "title": "Draw Guest Entry by Gate Chart"
+        }
+      }
+    },
+    "Vehicle Entry": {
+      "type": "object",
+      "description": "Process vehicle entry events and generate chart.",
+      "ecoscope:task_group": true,
+      "properties": {
+        "vehicle_gate_bar": {
+          "additionalProperties": false,
+          "properties": {
+            "bar_chart_configs": {
+              "items": {
+                "$ref": "#/$defs/BarConfig"
+              },
+              "title": "Bar Chart Configuration",
+              "type": "array",
+              "description": "Bar chart configuration.",
+              "default": [
+                {
+                  "column": "paying",
+                  "agg_func": "sum",
+                  "label": "Paying Vehicles",
+                  "show_label": true
+                },
+                {
+                  "column": "nonpaying",
+                  "agg_func": "sum",
+                  "label": "Non-Paying Vehicles",
+                  "show_label": true
+                },
+                {
+                  "column": "sticker",
+                  "agg_func": "sum",
+                  "label": "Annual Sticker",
+                  "show_label": true
+                }
+              ]
+            }
+          },
+          "required": [
+            "bar_chart_configs"
+          ],
+          "type": "object",
+          "title": "Draw Vehicle Entry by Gate Chart"
+        }
+      }
+    },
+    "Dashboard Widgets": {
+      "type": "object",
+      "description": "Create chart and table widgets for the dashboard.",
+      "ecoscope:task_group": true,
+      "properties": {
+        "guest_table": {
+          "additionalProperties": false,
+          "properties": {
+            "columns": {
+              "default": null,
+              "items": {
+                "type": "string"
+              },
+              "title": "Columns",
+              "type": "array",
+              "description": "The list of dataframe columns to render in the table. Leave empty to render all columns",
+              "ecoscope:advanced": true
+            }
+          },
+          "required": [],
+          "type": "object",
+          "title": "Draw Guest Summary Table"
+        }
+      }
+    },
+    "tourism_report": {
+      "additionalProperties": false,
+      "properties": {
+        "template_path": {
+          "title": "Template Path",
+          "type": "string",
+          "description": "Path or URL to the Word template (.docx) file with Jinja2 placeholders. Supports local paths and remote URLs (http://, https://).",
+          "default": "https://raw.githubusercontent.com/wildlife-dynamics/mt-tourism/main/resources/templates/mt_tourism_report_template.docx"
+        }
+      },
+      "required": [
+        "template_path"
+      ],
+      "type": "object",
+      "title": "Create Tourism Report"
+    }
+  },
+  "$defs": {
+    "TimezoneInfo": {
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "tzCode": {
+          "title": "Tzcode",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "utc": {
+          "title": "Utc",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "tzCode",
+        "name",
+        "utc"
+      ],
+      "title": "TimezoneInfo",
+      "type": "object"
+    },
+    "SummaryParam": {
+      "properties": {
+        "display_name": {
+          "title": "Display Name",
+          "type": "string"
+        },
+        "aggregator": {
+          "enum": [
+            "sum",
+            "count",
+            "min",
+            "max",
+            "mean",
+            "unique",
+            "nunique",
+            "median",
+            "night_day_ratio"
+          ],
+          "title": "Aggregator",
+          "type": "string"
+        },
+        "column": {
+          "default": null,
+          "title": "Column",
+          "type": "string"
+        },
+        "original_unit": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Unit"
+            }
+          ],
+          "default": null,
+          "title": "Original Unit"
+        },
+        "new_unit": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Unit"
+            }
+          ],
+          "default": null,
+          "title": "New Unit"
+        },
+        "decimal_places": {
+          "default": 2,
+          "title": "Decimal Places",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "display_name",
+        "aggregator"
+      ],
+      "title": "SummaryParam",
+      "type": "object"
+    },
+    "Unit": {
+      "enum": [
+        "m",
+        "km",
+        "s",
+        "h",
+        "d",
+        "m/s",
+        "km/h"
+      ],
+      "title": "Unit",
+      "type": "string"
+    },
+    "BarConfig": {
+      "properties": {
+        "column": {
+          "description": "The dataframe column to aggregate.",
+          "title": "Column",
+          "type": "string"
+        },
+        "agg_func": {
+          "description": "The aggregate function to apply.",
+          "enum": [
+            "sum",
+            "count",
+            "min",
+            "max",
+            "mean",
+            "unique",
+            "nunique",
+            "median",
+            "night_day_ratio"
+          ],
+          "title": "Agg Func",
+          "type": "string"
+        },
+        "label": {
+          "description": "The label for the bar in the chart legend.",
+          "title": "Label",
+          "type": "string"
+        },
+        "show_label": {
+          "default": false,
+          "description": "Whether to show the value label on top of the bar.",
+          "ecoscope:advanced": true,
+          "title": "Show Label",
+          "type": "boolean"
+        },
+        "style": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/PlotCategoryStyle"
+            }
+          ],
+          "default": null,
+          "description": "The style parameters for the category",
+          "ecoscope:advanced": true,
+          "title": "Style"
+        }
+      },
+      "required": [
+        "column",
+        "agg_func",
+        "label"
+      ],
+      "title": "BarConfig",
+      "type": "object"
+    },
+    "PlotCategoryStyle": {
+      "properties": {
+        "marker_color": {
+          "default": null,
+          "ecoscope:advanced": true,
+          "title": "Marker Color",
+          "type": "string"
+        },
+        "textposition": {
+          "default": null,
+          "ecoscope:advanced": true,
+          "title": "Textposition",
+          "type": "string"
+        },
+        "texttemplate": {
+          "default": null,
+          "ecoscope:advanced": true,
+          "title": "Texttemplate",
+          "type": "string"
+        }
+      },
+      "title": "PlotCategoryStyle",
+      "type": "object"
+    }
+  },
+  "uiSchema": {
+    "workflow_details": {
+      "ui:order": [
+        "name",
+        "description"
+      ]
+    },
+    "time_range": {
+      "ui:order": [
+        "since",
+        "until",
+        "timezone"
+      ]
+    },
+    "tourism_events": {
+      "ui:order": [
+        "file_path",
+        "layer"
+      ]
+    },
+    "Guest Entry": {
+      "ui:order": [
+        "guest_summary",
+        "guest_group_bar",
+        "guest_gate_bar"
+      ]
+    },
+    "ui:order": [
+      "workflow_details",
+      "time_range",
+      "tourism_events",
+      "Guest Entry",
+      "Vehicle Entry",
+      "Dashboard Widgets",
+      "tourism_report"
+    ]
+  },
+  "additionalProperties": false
+}

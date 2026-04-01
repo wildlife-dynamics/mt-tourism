@@ -13,7 +13,7 @@ base:
         name: "(UTC+03:00) Nairobi"
         utc: "+03:00"
     tourism_events:
-      file_path: "resources/mock-data/mt_guest_event.parquet"
+      file_path: "/Users/yunwu/MEP/wt/mt-tourism/resources/mock-data/mt_guest_event.parquet"
     guest_summary:
       summary_params:
         - display_name: "Non Resident Adults"
