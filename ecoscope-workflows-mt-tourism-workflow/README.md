@@ -5,21 +5,21 @@
 
 ```yaml
 # fingerprint:
-artifacts_sha256_basic: d1c97fdf00647e54590fde0e331de3757e7bac4263680dff77bda36415d6fff6
-artifacts_sha256_strict: f2e861ba503c7a3cc54fff25bf2fe7152bc0cc814c1c6efd1e7bad5e01684648
+artifacts_sha256_basic: 6aa70c9e259edc018738b23424ee360854de8e3e001629c720af2aaebc374e2b
+artifacts_sha256_strict: 496ee80e464c02d4f313a00c815def9df2119b6595811583771e280176b897fe
 installed_requirements:
 - channel: https://repo.prefix.dev/ecoscope-workflows/
   name: ecoscope-workflows-core
-  version: {version: ==0.22.14}
+  version: {version: ==0.22.18}
 - channel: https://repo.prefix.dev/ecoscope-workflows/
   name: ecoscope-workflows-ext-ecoscope
-  version: {version: ==0.22.17}
-- channel: https://repo.prefix.dev/ecoscope-workflows-custom/
+  version: {version: ==0.22.18}
+- channel: file:///tmp/ecoscope-workflows-custom/release/artifacts/
   name: ecoscope-workflows-ext-custom
   version: {version: ==0.0.41}
-- channel: https://repo.prefix.dev/ecoscope-workflows-custom/
+- channel: file:///tmp/ecoscope-workflows-custom/release/artifacts/
   name: ecoscope-workflows-ext-mt
-  version: {version: ==10000.dev71+g26b10f6}
+  version: {version: ==0.0.2}
 - channel: https://repo.prefix.dev/ecoscope-workflows-custom/
   name: pydeck
   version: {version: ==0.9.1a2}

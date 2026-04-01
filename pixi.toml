@@ -1,6 +1,7 @@
 [project]
 name = "mt-tourism"
 channels = [
+    'file:///tmp/ecoscope-workflows-custom/release/artifacts/',
     'https://repo.prefix.dev/ecoscope-workflows/',
     'https://repo.prefix.dev/ecoscope-workflows-custom/',
     'conda-forge',
@@ -16,7 +17,8 @@ hatch = "*"
 [feature.compile.dependencies]
 ecoscope-workflows-core = ">=0.22.18, <0.23.0"
 ecoscope-workflows-ext-ecoscope = ">=0.22.18, <0.23.0"
-ecoscope-workflows-ext-custom = ">=0.0.41, <0.1.0"
+ecoscope-workflows-ext-custom = { version = "*", channel = "file:///tmp/ecoscope-workflows-custom/release/artifacts/" }
+ecoscope-workflows-ext-mt = { version = "*", channel = "file:///tmp/ecoscope-workflows-custom/release/artifacts/" }
 
 [environments]
 compile = { features = [
