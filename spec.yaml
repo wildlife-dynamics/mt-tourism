@@ -10,11 +10,116 @@ requirements:
   - name: ecoscope-workflows-ext-custom
     version: ">=0.0.41, <0.1.0"
     channel: https://repo.prefix.dev/ecoscope-workflows-custom/
+  - name: ecoscope-workflows-ext-mt
+    version: ">=0.0.2"
+    channel: https://repo.prefix.dev/ecoscope-workflows-custom/
+  - name: pydeck
+    version: "0.0.2"
+    channel: https://repo.prefix.dev/ecoscope-workflows-custom/
 
 rjsf-overrides:
-  properties: {}
-  $defs: {}
-  uiSchema: {}
+  properties:
+    # Phase 3 defaults (uncomment when switching to ER connection)
+    # get_event_data.properties.event_types.default: ["guest_entry", "vehicle_entry"]
+    # get_event_data.properties.event_types.description: >-
+    #   Tourism event types to include in the report.
+    Guest Entry.properties.guest_summary.properties.summary_params.default:
+      - display_name: "Non Resident Adults"
+        aggregator: sum
+        column: nra
+      - display_name: "Non Resident Children"
+        aggregator: sum
+        column: nrc
+      - display_name: "Non Resident Students"
+        aggregator: sum
+        column: nrs
+      - display_name: "Citizen Adults"
+        aggregator: sum
+        column: ca
+      - display_name: "Citizen Children"
+        aggregator: sum
+        column: cc
+      - display_name: "Citizen Students"
+        aggregator: sum
+        column: cs
+      - display_name: "Resident Adults"
+        aggregator: sum
+        column: ra
+      - display_name: "Resident Children"
+        aggregator: sum
+        column: rc
+      - display_name: "Resident Students"
+        aggregator: sum
+        column: rs
+      - display_name: "Narok Adults"
+        aggregator: sum
+        column: na
+      - display_name: "Narok Children"
+        aggregator: sum
+        column: nc
+      - display_name: "Narok Students"
+        aggregator: sum
+        column: ns
+    Guest Entry.properties.guest_group_bar.properties.bar_chart_configs.default:
+      - column: "Non Resident Adults"
+        agg_func: "sum"
+        label: "Non Resident Adults"
+      - column: "Non Resident Children"
+        agg_func: "sum"
+        label: "Non Resident Children"
+      - column: "Non Resident Students"
+        agg_func: "sum"
+        label: "Non Resident Students"
+      - column: "Resident Adults"
+        agg_func: "sum"
+        label: "Resident Adults"
+      - column: "Resident Children"
+        agg_func: "sum"
+        label: "Resident Children"
+      - column: "Resident Students"
+        agg_func: "sum"
+        label: "Resident Students"
+      - column: "Citizen Adults"
+        agg_func: "sum"
+        label: "Citizen Adults"
+      - column: "Citizen Children"
+        agg_func: "sum"
+        label: "Citizen Children"
+      - column: "Citizen Students"
+        agg_func: "sum"
+        label: "Citizen Students"
+      - column: "Narok Adults"
+        agg_func: "sum"
+        label: "Narok Adults"
+      - column: "Narok Children"
+        agg_func: "sum"
+        label: "Narok Children"
+      - column: "Narok Students"
+        agg_func: "sum"
+        label: "Narok Students"
+    Guest Entry.properties.guest_gate_bar.properties.bar_chart_configs.default:
+      - column: "Paying Guests"
+        agg_func: "sum"
+        label: "Paying Guests"
+        show_label: true
+      - column: "Narok County Government(NCG) Guests"
+        agg_func: "sum"
+        label: "Narok County Government(NCG) Guests"
+        show_label: true
+    Vehicle Entry.properties.vehicle_gate_bar.properties.bar_chart_configs.default:
+      - column: "paying"
+        agg_func: "sum"
+        label: "Paying Vehicles"
+        show_label: true
+      - column: "nonpaying"
+        agg_func: "sum"
+        label: "Non-Paying Vehicles"
+        show_label: true
+      - column: "sticker"
+        agg_func: "sum"
+        label: "Annual Sticker"
+        show_label: true
+    tourism_report.properties.template_path.default: "https://raw.githubusercontent.com/wildlife-dynamics/mt-tourism/main/resources/templates/mt_tourism_report_template.docx"
 
 task-instance-defaults:
   skipif:
@@ -23,6 +128,7 @@ task-instance-defaults:
       - any_dependency_skipped
 
 workflow:
+  # Setup
   - name: Workflow Details
     id: workflow_details
     task: set_workflow_details
@@ -39,13 +145,291 @@ workflow:
     partial:
       time_range: ${{ workflow.time_range.return }}
 
-  # TODO: Add data source, processing, and visualization tasks
+  # Data Source — Phase 2: load from local file
+  - name: Load Tourism Events
+    id: tourism_events
+    task: load_df
+    partial:
+      deserialize_json: true
 
+  # Phase 3 — uncomment to restore ER connection:
+  # - name: Data Source
+  #   id: er_client_name
+  #   task: set_er_connection
+  #
+  # - name: Get Tourism Events
+  #   id: get_event_data
+  #   task: get_events
+  #   partial:
+  #     client: ${{ workflow.er_client_name.return }}
+  #     time_range: ${{ workflow.time_range.return }}
+  #     event_columns: null
+  #     raise_on_empty: false
+  #     include_details: true
+  #     include_updates: false
+  #     include_related_events: false
+  #     include_display_values: false
+  #     include_null_geometry: true
+  #
+  # - name: Normalize Event Details
+  #   id: normalize_details
+  #   task: normalize_json_column
+  #   partial:
+  #     df: ${{ workflow.get_event_data.return }}
+  #     column: "event_details"
+  #     skip_if_not_exists: true
+  #     sort_columns: false
+  #
+  # - name: Remove Event Details Prefix
+  #   id: tourism_events
+  #   task: drop_column_prefix
+  #   partial:
+  #     df: ${{ workflow.normalize_details.return }}
+  #     prefix: "event_details__"
+  #     duplicate_strategy: "suffix"
+
+  # Guest Entry Pipeline
+  - title: Guest Entry
+    type: task-group
+    description: "Process guest entry events: categorize, summarize, and chart."
+    tasks:
+      - name: Filter Guest Entry Events
+        id: filter_guest
+        task: ecoscope_workflows_ext_custom.tasks.transformation.filter_row_values
+        partial:
+          df: ${{ workflow.tourism_events.return }}
+          column: "event_type"
+          values: ["guest_entry"]
+
+      - name: Process Guest Entry
+        id: guest_entry_data
+        task: ecoscope_workflows_ext_mt.tasks.mt_guest_entry
+        partial:
+          df: ${{ workflow.filter_guest.return }}
+
+      - name: Summarize Guest Entry
+        id: guest_summary
+        task: summarize_df
+        partial:
+          df: ${{ workflow.guest_entry_data.return }}
+          groupby_cols: ["guest_group"]
+          reset_index: true
+
+      - name: Guest Entry Pivot by Gate
+        id: guest_pivot
+        task: ecoscope_workflows_ext_mt.tasks.mt_guest_entry_pivot
+        partial:
+          df: ${{ workflow.guest_entry_data.return }}
+
+      - name: Draw Guest Entry by Group Chart
+        id: guest_group_bar
+        task: draw_bar_chart
+        partial:
+          dataframe: ${{ workflow.guest_summary.return }}
+          category: "guest_group"
+          layout_kwargs: null
+
+      - name: Persist Guest Group Chart
+        id: persist_guest_group_bar
+        task: persist_text
+        partial:
+          text: ${{ workflow.guest_group_bar.return }}
+          root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+          filename_suffix: "guest_group_bar"
+
+      - name: Draw Guest Entry by Gate Chart
+        id: guest_gate_bar
+        task: draw_bar_chart
+        partial:
+          dataframe: ${{ workflow.guest_pivot.return }}
+          category: "gate"
+          layout_kwargs: null
+
+      - name: Persist Guest Gate Chart
+        id: persist_guest_gate_bar
+        task: persist_text
+        partial:
+          text: ${{ workflow.guest_gate_bar.return }}
+          root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+          filename_suffix: "guest_gate_bar"
+
+  # Vehicle Entry Pipeline
+  - title: Vehicle Entry
+    type: task-group
+    description: "Process vehicle entry events and generate chart."
+    tasks:
+      - name: Filter Vehicle Entry Events
+        id: filter_vehicle
+        task: ecoscope_workflows_ext_custom.tasks.transformation.filter_row_values
+        partial:
+          df: ${{ workflow.tourism_events.return }}
+          column: "event_type"
+          values: ["vehicle_entry"]
+
+      - name: Draw Vehicle Entry by Gate Chart
+        id: vehicle_gate_bar
+        task: draw_bar_chart
+        partial:
+          dataframe: ${{ workflow.filter_vehicle.return }}
+          category: "gate"
+          layout_kwargs: null
+
+      - name: Persist Vehicle Gate Chart
+        id: persist_vehicle_gate_bar
+        task: persist_text
+        partial:
+          text: ${{ workflow.vehicle_gate_bar.return }}
+          root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+          filename_suffix: "vehicle_gate_bar"
+
+  # Dashboard Widgets
+  - title: Dashboard Widgets
+    type: task-group
+    description: "Create chart and table widgets for the dashboard."
+    tasks:
+      - name: Set Guest Group Chart Title
+        id: set_guest_group_title
+        task: set_string_var
+        partial:
+          var: "Guest Entry by Group"
+
+      - name: Create Guest Group Chart Widget
+        id: guest_group_widget
+        task: create_plot_widget_single_view
+        skipif:
+          conditions:
+            - never
+        partial:
+          title: ${{ workflow.set_guest_group_title.return }}
+          data: ${{ workflow.persist_guest_group_bar.return }}
+
+      - name: Set Guest Gate Chart Title
+        id: set_guest_gate_title
+        task: set_string_var
+        partial:
+          var: "Guest Entry by Gate"
+
+      - name: Create Guest Gate Chart Widget
+        id: guest_gate_widget
+        task: create_plot_widget_single_view
+        skipif:
+          conditions:
+            - never
+        partial:
+          title: ${{ workflow.set_guest_gate_title.return }}
+          data: ${{ workflow.persist_guest_gate_bar.return }}
+
+      - name: Set Vehicle Chart Title
+        id: set_vehicle_title
+        task: set_string_var
+        partial:
+          var: "Vehicle Entry by Gate"
+
+      - name: Create Vehicle Chart Widget
+        id: vehicle_widget
+        task: create_plot_widget_single_view
+        skipif:
+          conditions:
+            - never
+        partial:
+          title: ${{ workflow.set_vehicle_title.return }}
+          data: ${{ workflow.persist_vehicle_gate_bar.return }}
+
+      - name: Set Table Title
+        id: set_table_title
+        task: set_string_var
+        partial:
+          var: "Guest Entry Summary"
+
+      - name: Draw Guest Summary Table
+        id: guest_table
+        task: draw_table
+        partial:
+          dataframe: ${{ workflow.guest_summary.return }}
+          table_config:
+            enable_sorting: true
+          widget_id: ${{ workflow.set_table_title.return }}
+
+      - name: Persist Guest Table
+        id: persist_guest_table
+        task: persist_text
+        partial:
+          text: ${{ workflow.guest_table.return }}
+          root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+          filename_suffix: "guest_summary_table"
+
+      - name: Create Table Widget
+        id: table_widget
+        task: create_table_widget_single_view
+        skipif:
+          conditions:
+            - never
+        partial:
+          title: ${{ workflow.set_table_title.return }}
+          data: ${{ workflow.persist_guest_table.return }}
+
+  # Data Export
+  - name: Export Guest Summary
+    id: persist_guest_csv
+    task: persist_df_wrapper
+    partial:
+      df: ${{ workflow.guest_summary.return }}
+      root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+      filename_prefix: "guest_entry_summary"
+      filetypes: ["csv"]
+      sanitize: false
+    skipif:
+      conditions:
+        - never
+
+  # DOCX Report
+  - name: Create Tourism Report
+    id: tourism_report
+    task: ecoscope_workflows_ext_custom.tasks.results.create_docx
+    partial:
+      groupers: null
+      context:
+        items:
+          - item_type: timerange
+            key: report_date
+            value: ${{ workflow.time_range.return }}
+            format: "%b %Y"
+          - item_type: image
+            key: guest_entry_bar_chart
+            value: ${{ workflow.persist_guest_group_bar.return }}
+            screenshot_config:
+              wait_for_timeout: 0
+              max_concurrent_pages: 2
+          - item_type: image
+            key: guest_entry_bar_gate
+            value: ${{ workflow.persist_guest_gate_bar.return }}
+            screenshot_config:
+              wait_for_timeout: 0
+              max_concurrent_pages: 2
+          - item_type: image
+            key: vehicle_entry_bar
+            value: ${{ workflow.persist_vehicle_gate_bar.return }}
+            screenshot_config:
+              wait_for_timeout: 0
+              max_concurrent_pages: 2
+          - item_type: table
+            key: data
+            value: ${{ workflow.guest_summary.return }}
+      output_dir: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+      filename_prefix: mt_tourism_report
+    skipif:
+      conditions:
+        - never
+
+  # Dashboard
   - name: Create Dashboard
     id: dashboard
     task: gather_dashboard
     partial:
       details: ${{ workflow.workflow_details.return }}
-      widgets: []
-      groupers: null
+      widgets:
+        - ${{ workflow.guest_group_widget.return }}
+        - ${{ workflow.guest_gate_widget.return }}
+        - ${{ workflow.vehicle_widget.return }}
+        - ${{ workflow.table_widget.return }}
       time_range: ${{ workflow.time_range.return }}

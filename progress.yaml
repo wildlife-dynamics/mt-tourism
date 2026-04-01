@@ -1,0 +1,39 @@
+phase: new
+status: in-progress
+lastUpdated: '2026-04-01'
+notes: ''
+
+setup:
+  - name: Scaffold repo
+    status: completed
+  - name: Populate files from PRD
+    status: completed
+
+tasks:
+  - name: Guest entry pipeline (filter → mt_guest_entry → summarize → pivot → bar charts)
+    status: pending
+    type: implement
+  - name: Vehicle entry pipeline (filter → bar chart)
+    status: pending
+    type: implement
+  - name: Dashboard widgets (3 charts + 1 table)
+    status: pending
+    type: implement
+  - name: Data export (guest summary CSV)
+    status: pending
+    type: implement
+  - name: DOCX report (3 chart images + summary table)
+    status: pending
+    type: implement
+  - name: Configure rjsf
+    status: pending
+    type: configure
+  - name: Configure layout
+    status: pending
+    type: configure
+
+wrapup:
+  - name: Self-check against acceptance criteria
+    status: pending
+  - name: Phase transition (Phase 3 reconnect ER API)
+    status: pending
