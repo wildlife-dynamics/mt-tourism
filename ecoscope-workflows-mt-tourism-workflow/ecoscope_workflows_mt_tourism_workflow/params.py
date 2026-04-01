@@ -31,17 +31,6 @@ class TourismEvents(BaseModel):
     )
 
 
-class GuestTable(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    columns: list[str] | None = Field(
-        None,
-        description="The list of dataframe columns to render in the table. Leave empty to render all columns",
-        title="Columns",
-    )
-
-
 class TourismReport(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -82,5 +71,4 @@ class Params(BaseModel):
         None, description="Choose the period of time to analyze.", title="Time Range"
     )
     tourism_events: TourismEvents | None = Field(None, title="Load Tourism Events")
-    guest_table: GuestTable | None = Field(None, title="Draw Guest Summary Table")
     tourism_report: TourismReport | None = Field(None, title="Create Tourism Report")

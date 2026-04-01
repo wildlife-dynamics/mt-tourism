@@ -858,9 +858,7 @@ set_table_title = (
 # %%
 # parameters
 
-guest_table_params = dict(
-    columns=...,
-)
+guest_table_params = dict()
 
 # %%
 # call the task
@@ -879,6 +877,7 @@ guest_table = (
     )
     .partial(
         dataframe=guest_summary,
+        columns=None,
         table_config={"enable_sorting": True},
         widget_id=set_table_title,
         **guest_table_params,

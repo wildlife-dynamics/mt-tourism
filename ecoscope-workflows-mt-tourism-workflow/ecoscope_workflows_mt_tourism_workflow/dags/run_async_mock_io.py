@@ -714,6 +714,7 @@ def main(params: Params):
             .set_executor("lithops"),
             partial={
                 "dataframe": DependsOn("guest_summary"),
+                "columns": None,
                 "table_config": {
                     "enable_sorting": True,
                 },

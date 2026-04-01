@@ -625,6 +625,7 @@ def main(params: Params):
         )
         .partial(
             dataframe=guest_summary,
+            columns=None,
             table_config={"enable_sorting": True},
             widget_id=set_table_title,
             **(params_dict.get("guest_table") or {}),

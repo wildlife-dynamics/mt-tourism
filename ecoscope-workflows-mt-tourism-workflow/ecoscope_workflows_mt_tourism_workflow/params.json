@@ -75,24 +75,6 @@
       "type": "object",
       "title": "Load Tourism Events"
     },
-    "guest_table": {
-      "additionalProperties": false,
-      "properties": {
-        "columns": {
-          "default": null,
-          "items": {
-            "type": "string"
-          },
-          "title": "Columns",
-          "type": "array",
-          "description": "The list of dataframe columns to render in the table. Leave empty to render all columns",
-          "ecoscope:advanced": true
-        }
-      },
-      "required": [],
-      "type": "object",
-      "title": "Draw Guest Summary Table"
-    },
     "tourism_report": {
       "additionalProperties": false,
       "properties": {
@@ -163,7 +145,6 @@
       "workflow_details",
       "time_range",
       "tourism_events",
-      "guest_table",
       "tourism_report"
     ]
   },

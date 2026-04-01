@@ -26,14 +26,14 @@ tasks:
     status: completed
     type: implement
   - name: Configure rjsf
-    status: in-progress
+    status: completed
     type: configure
   - name: Configure layout
-    status: pending
+    status: completed
     type: configure
 
 wrapup:
   - name: Self-check against acceptance criteria
-    status: pending
+    status: in-progress
   - name: Phase transition (Phase 3 reconnect ER API)
     status: pending

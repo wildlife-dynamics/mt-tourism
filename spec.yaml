@@ -342,6 +342,7 @@ workflow:
         task: draw_table
         partial:
           dataframe: ${{ workflow.guest_summary.return }}
+          columns: null
           table_config:
             enable_sorting: true
           widget_id: ${{ workflow.set_table_title.return }}
