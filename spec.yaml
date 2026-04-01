@@ -45,48 +45,42 @@ workflow:
     partial:
       time_range: ${{ workflow.time_range.return }}
 
-  # Data Source — Phase 2: load from local file
-  - name: Load Tourism Events
-    id: tourism_events
-    task: load_df
-    partial:
-      deserialize_json: true
+  # Data Source
+  - name: Data Source
+    id: er_client_name
+    task: set_er_connection
 
-  # Phase 3 — uncomment to restore ER connection:
-  # - name: Data Source
-  #   id: er_client_name
-  #   task: set_er_connection
-  #
-  # - name: Get Tourism Events
-  #   id: get_event_data
-  #   task: get_events
-  #   partial:
-  #     client: ${{ workflow.er_client_name.return }}
-  #     time_range: ${{ workflow.time_range.return }}
-  #     event_columns: null
-  #     raise_on_empty: false
-  #     include_details: true
-  #     include_updates: false
-  #     include_related_events: false
-  #     include_display_values: false
-  #     include_null_geometry: true
-  #
-  # - name: Normalize Event Details
-  #   id: normalize_details
-  #   task: normalize_json_column
-  #   partial:
-  #     df: ${{ workflow.get_event_data.return }}
-  #     column: "event_details"
-  #     skip_if_not_exists: true
-  #     sort_columns: false
-  #
-  # - name: Remove Event Details Prefix
-  #   id: tourism_events
-  #   task: drop_column_prefix
-  #   partial:
-  #     df: ${{ workflow.normalize_details.return }}
-  #     prefix: "event_details__"
-  #     duplicate_strategy: "suffix"
+  - name: Get Tourism Events
+    id: get_event_data
+    task: get_events
+    partial:
+      client: ${{ workflow.er_client_name.return }}
+      time_range: ${{ workflow.time_range.return }}
+      event_columns: null
+      event_types: ["guest_entry", "vehicle_entry"]
+      raise_on_empty: false
+      include_details: true
+      include_updates: false
+      include_related_events: false
+      include_display_values: false
+      include_null_geometry: true
+
+  - name: Normalize Event Details
+    id: normalize_details
+    task: normalize_json_column
+    partial:
+      df: ${{ workflow.get_event_data.return }}
+      column: "event_details"
+      skip_if_not_exists: true
+      sort_columns: false
+
+  - name: Remove Event Details Prefix
+    id: tourism_events
+    task: drop_column_prefix
+    partial:
+      df: ${{ workflow.normalize_details.return }}
+      prefix: "event_details__"
+      duplicate_strategy: "suffix"
 
   # Guest Entry Pipeline
   - title: Guest Entry

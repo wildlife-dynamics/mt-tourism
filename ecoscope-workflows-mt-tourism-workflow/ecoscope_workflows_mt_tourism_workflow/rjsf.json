@@ -53,27 +53,20 @@
       "description": "Choose the period of time to analyze.",
       "title": "Time Range"
     },
-    "tourism_events": {
+    "er_client_name": {
       "additionalProperties": false,
       "properties": {
-        "file_path": {
-          "title": "File Path",
-          "type": "string",
-          "description": "Path to the file to load. Supported formats: .parquet, .geoparquet, .geojson, .json, .gpkg, .csv, .shp"
-        },
-        "layer": {
-          "default": null,
-          "title": "Layer",
-          "type": "string",
-          "description": "Layer name for GeoPackage files (optional, only used for .gpkg files)",
-          "ecoscope:advanced": true
+        "data_source": {
+          "$ref": "#/$defs/EarthRangerConnection",
+          "title": "",
+          "description": "Select one of your configured data sources."
         }
       },
       "required": [
-        "file_path"
+        "data_source"
       ],
       "type": "object",
-      "title": "Load Tourism Events"
+      "title": "Data Source"
     },
     "tourism_report": {
       "additionalProperties": false,
@@ -120,6 +113,19 @@
       ],
       "title": "TimezoneInfo",
       "type": "object"
+    },
+    "EarthRangerConnection": {
+      "properties": {
+        "name": {
+          "title": "Data Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "EarthRangerConnection",
+      "type": "object"
     }
   },
   "uiSchema": {
@@ -136,16 +142,10 @@
         "timezone"
       ]
     },
-    "tourism_events": {
-      "ui:order": [
-        "file_path",
-        "layer"
-      ]
-    },
     "ui:order": [
       "workflow_details",
       "time_range",
-      "tourism_events",
+      "er_client_name",
       "tourism_report"
     ]
   },

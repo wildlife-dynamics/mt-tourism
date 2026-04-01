@@ -21,6 +21,7 @@ from ecoscope_workflows_core.tasks.filter import (
 )
 from ecoscope_workflows_core.tasks.filter import set_time_range as set_time_range
 from ecoscope_workflows_core.tasks.io import persist_text as persist_text
+from ecoscope_workflows_core.tasks.io import set_er_connection as set_er_connection
 from ecoscope_workflows_core.tasks.results import (
     create_plot_widget_single_view as create_plot_widget_single_view,
 )
@@ -33,19 +34,25 @@ from ecoscope_workflows_core.tasks.skip import (
 )
 from ecoscope_workflows_core.tasks.skip import any_is_empty_df as any_is_empty_df
 from ecoscope_workflows_core.tasks.skip import never as never
-from ecoscope_workflows_ext_custom.tasks.io import load_df as load_df
 from ecoscope_workflows_ext_custom.tasks.io import (
     persist_df_wrapper as persist_df_wrapper,
 )
 from ecoscope_workflows_ext_custom.tasks.results import create_docx as create_docx
 from ecoscope_workflows_ext_custom.tasks.transformation import (
+    drop_column_prefix as drop_column_prefix,
+)
+from ecoscope_workflows_ext_custom.tasks.transformation import (
     filter_row_values as filter_row_values,
 )
 from ecoscope_workflows_ext_ecoscope.tasks.analysis import summarize_df as summarize_df
+from ecoscope_workflows_ext_ecoscope.tasks.io import get_events as get_events
 from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_bar_chart as draw_bar_chart,
 )
 from ecoscope_workflows_ext_ecoscope.tasks.results import draw_table as draw_table
+from ecoscope_workflows_ext_ecoscope.tasks.transformation import (
+    normalize_json_column as normalize_json_column,
+)
 from ecoscope_workflows_ext_mt.tasks import mt_guest_entry as mt_guest_entry
 from ecoscope_workflows_ext_mt.tasks import mt_guest_entry_pivot as mt_guest_entry_pivot
 
@@ -142,22 +149,21 @@ get_timezone = (
 
 
 # %% [markdown]
-# ## Load Tourism Events
+# ## Data Source
 
 # %%
 # parameters
 
-tourism_events_params = dict(
-    file_path=...,
-    layer=...,
+er_client_name_params = dict(
+    data_source=...,
 )
 
 # %%
 # call the task
 
 
-tourism_events = (
-    load_df.set_task_instance_id("tourism_events")
+er_client_name = (
+    set_er_connection.set_task_instance_id("er_client_name")
     .handle_errors()
     .with_tracing()
     .skipif(
@@ -167,7 +173,114 @@ tourism_events = (
         ],
         unpack_depth=1,
     )
-    .partial(deserialize_json=True, **tourism_events_params)
+    .partial(**er_client_name_params)
+    .call()
+)
+
+
+# %% [markdown]
+# ## Get Tourism Events
+
+# %%
+# parameters
+
+get_event_data_params = dict()
+
+# %%
+# call the task
+
+
+get_event_data = (
+    get_events.set_task_instance_id("get_event_data")
+    .handle_errors()
+    .with_tracing()
+    .skipif(
+        conditions=[
+            any_is_empty_df,
+            any_dependency_skipped,
+        ],
+        unpack_depth=1,
+    )
+    .partial(
+        client=er_client_name,
+        time_range=time_range,
+        event_columns=None,
+        event_types=["guest_entry", "vehicle_entry"],
+        raise_on_empty=False,
+        include_details=True,
+        include_updates=False,
+        include_related_events=False,
+        include_display_values=False,
+        include_null_geometry=True,
+        **get_event_data_params,
+    )
+    .call()
+)
+
+
+# %% [markdown]
+# ## Normalize Event Details
+
+# %%
+# parameters
+
+normalize_details_params = dict()
+
+# %%
+# call the task
+
+
+normalize_details = (
+    normalize_json_column.set_task_instance_id("normalize_details")
+    .handle_errors()
+    .with_tracing()
+    .skipif(
+        conditions=[
+            any_is_empty_df,
+            any_dependency_skipped,
+        ],
+        unpack_depth=1,
+    )
+    .partial(
+        df=get_event_data,
+        column="event_details",
+        skip_if_not_exists=True,
+        sort_columns=False,
+        **normalize_details_params,
+    )
+    .call()
+)
+
+
+# %% [markdown]
+# ## Remove Event Details Prefix
+
+# %%
+# parameters
+
+tourism_events_params = dict()
+
+# %%
+# call the task
+
+
+tourism_events = (
+    drop_column_prefix.set_task_instance_id("tourism_events")
+    .handle_errors()
+    .with_tracing()
+    .skipif(
+        conditions=[
+            any_is_empty_df,
+            any_dependency_skipped,
+        ],
+        unpack_depth=1,
+    )
+    .partial(
+        df=normalize_details,
+        prefix="event_details__",
+        duplicate_strategy="suffix",
+        **tourism_events_params,
+    )
     .call()
 )
 

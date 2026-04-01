@@ -15,22 +15,6 @@ class WorkflowDetails(BaseModel):
     description: str | None = Field("", title="Workflow Description")
 
 
-class TourismEvents(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    file_path: str = Field(
-        ...,
-        description="Path to the file to load. Supported formats: .parquet, .geoparquet, .geojson, .json, .gpkg, .csv, .shp",
-        title="File Path",
-    )
-    layer: str | None = Field(
-        None,
-        description="Layer name for GeoPackage files (optional, only used for .gpkg files)",
-        title="Layer",
-    )
-
-
 class TourismReport(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -49,6 +33,10 @@ class TimezoneInfo(BaseModel):
     utc: str = Field(..., title="Utc")
 
 
+class EarthRangerConnection(BaseModel):
+    name: str = Field(..., title="Data Source")
+
+
 class TimeRange(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -56,6 +44,15 @@ class TimeRange(BaseModel):
     since: datetime = Field(..., description="The start time", title="Since")
     until: datetime = Field(..., description="The end time", title="Until")
     timezone: TimezoneInfo | None = Field(None, title="Timezone")
+
+
+class ErClientName(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    data_source: EarthRangerConnection = Field(
+        ..., description="Select one of your configured data sources.", title=""
+    )
 
 
 class FormData(BaseModel):
@@ -70,5 +67,5 @@ class FormData(BaseModel):
     time_range: TimeRange | None = Field(
         None, description="Choose the period of time to analyze.", title="Time Range"
     )
-    tourism_events: TourismEvents | None = Field(None, title="Load Tourism Events")
+    er_client_name: ErClientName | None = Field(None, title="Data Source")
     tourism_report: TourismReport | None = Field(None, title="Create Tourism Report")

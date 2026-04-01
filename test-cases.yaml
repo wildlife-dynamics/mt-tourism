@@ -1,6 +1,6 @@
-base:
-  name: Base Test Case
-  mock_io: true
+integration:
+  name: Integration Test
+  mock_io: false
   params:
     workflow_details:
       name: "MT TOURISM"
@@ -12,7 +12,8 @@ base:
         tzCode: "Africa/Nairobi"
         name: "(UTC+03:00) Nairobi"
         utc: "+03:00"
-    tourism_events:
-      file_path: "/Users/yunwu/MEP/wt/mt-tourism/resources/mock-data/mt_guest_event.parquet"
+    er_client_name:
+      data_source:
+        name: "mara"
     tourism_report:
       template_path: "/Users/yunwu/MEP/wt/mt-tourism/resources/templates/mt_tourism_report_template.docx"

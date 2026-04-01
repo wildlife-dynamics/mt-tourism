@@ -12,7 +12,6 @@ import os
 import warnings  # 🧪
 
 from ecoscope_workflows_core.graph import DependsOn, Graph, Node
-from ecoscope_workflows_core.tasks.config import set_string_var as set_string_var
 from ecoscope_workflows_core.tasks.config import (
     set_workflow_details as set_workflow_details,
 )
@@ -20,6 +19,18 @@ from ecoscope_workflows_core.tasks.filter import (
     get_timezone_from_time_range as get_timezone_from_time_range,
 )
 from ecoscope_workflows_core.tasks.filter import set_time_range as set_time_range
+from ecoscope_workflows_core.tasks.io import set_er_connection as set_er_connection
+from ecoscope_workflows_core.tasks.skip import (
+    any_dependency_skipped as any_dependency_skipped,
+)
+from ecoscope_workflows_core.tasks.skip import any_is_empty_df as any_is_empty_df
+from ecoscope_workflows_core.testing import create_task_magicmock  # 🧪
+
+get_events = create_task_magicmock(  # 🧪
+    anchor="ecoscope_workflows_ext_ecoscope.tasks.io",  # 🧪
+    func_name="get_events",  # 🧪
+)  # 🧪
+from ecoscope_workflows_core.tasks.config import set_string_var as set_string_var
 from ecoscope_workflows_core.tasks.io import persist_text as persist_text
 from ecoscope_workflows_core.tasks.results import (
     create_plot_widget_single_view as create_plot_widget_single_view,
@@ -28,16 +39,14 @@ from ecoscope_workflows_core.tasks.results import (
     create_table_widget_single_view as create_table_widget_single_view,
 )
 from ecoscope_workflows_core.tasks.results import gather_dashboard as gather_dashboard
-from ecoscope_workflows_core.tasks.skip import (
-    any_dependency_skipped as any_dependency_skipped,
-)
-from ecoscope_workflows_core.tasks.skip import any_is_empty_df as any_is_empty_df
 from ecoscope_workflows_core.tasks.skip import never as never
-from ecoscope_workflows_ext_custom.tasks.io import load_df as load_df
 from ecoscope_workflows_ext_custom.tasks.io import (
     persist_df_wrapper as persist_df_wrapper,
 )
 from ecoscope_workflows_ext_custom.tasks.results import create_docx as create_docx
+from ecoscope_workflows_ext_custom.tasks.transformation import (
+    drop_column_prefix as drop_column_prefix,
+)
 from ecoscope_workflows_ext_custom.tasks.transformation import (
     filter_row_values as filter_row_values,
 )
@@ -46,6 +55,9 @@ from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_bar_chart as draw_bar_chart,
 )
 from ecoscope_workflows_ext_ecoscope.tasks.results import draw_table as draw_table
+from ecoscope_workflows_ext_ecoscope.tasks.transformation import (
+    normalize_json_column as normalize_json_column,
+)
 from ecoscope_workflows_ext_mt.tasks import mt_guest_entry as mt_guest_entry
 from ecoscope_workflows_ext_mt.tasks import mt_guest_entry_pivot as mt_guest_entry_pivot
 
@@ -61,7 +73,10 @@ def main(params: Params):
         "workflow_details": [],
         "time_range": [],
         "get_timezone": ["time_range"],
-        "tourism_events": [],
+        "er_client_name": [],
+        "get_event_data": ["er_client_name", "time_range"],
+        "normalize_details": ["get_event_data"],
+        "tourism_events": ["normalize_details"],
         "filter_guest": ["tourism_events"],
         "guest_entry_data": ["filter_guest"],
         "guest_summary": ["guest_entry_data"],
@@ -156,8 +171,77 @@ def main(params: Params):
             | (params_dict.get("get_timezone") or {}),
             method="call",
         ),
+        "er_client_name": Node(
+            async_task=set_er_connection.validate()
+            .set_task_instance_id("er_client_name")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial=(params_dict.get("er_client_name") or {}),
+            method="call",
+        ),
+        "get_event_data": Node(
+            async_task=get_events.validate()
+            .set_task_instance_id("get_event_data")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial={
+                "client": DependsOn("er_client_name"),
+                "time_range": DependsOn("time_range"),
+                "event_columns": None,
+                "event_types": [
+                    "guest_entry",
+                    "vehicle_entry",
+                ],
+                "raise_on_empty": False,
+                "include_details": True,
+                "include_updates": False,
+                "include_related_events": False,
+                "include_display_values": False,
+                "include_null_geometry": True,
+            }
+            | (params_dict.get("get_event_data") or {}),
+            method="call",
+        ),
+        "normalize_details": Node(
+            async_task=normalize_json_column.validate()
+            .set_task_instance_id("normalize_details")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial={
+                "df": DependsOn("get_event_data"),
+                "column": "event_details",
+                "skip_if_not_exists": True,
+                "sort_columns": False,
+            }
+            | (params_dict.get("normalize_details") or {}),
+            method="call",
+        ),
         "tourism_events": Node(
-            async_task=load_df.validate()
+            async_task=drop_column_prefix.validate()
             .set_task_instance_id("tourism_events")
             .handle_errors()
             .with_tracing()
@@ -170,7 +254,9 @@ def main(params: Params):
             )
             .set_executor("lithops"),
             partial={
-                "deserialize_json": True,
+                "df": DependsOn("normalize_details"),
+                "prefix": "event_details__",
+                "duplicate_strategy": "suffix",
             }
             | (params_dict.get("tourism_events") or {}),
             method="call",
