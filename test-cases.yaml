@@ -15,4 +15,4 @@ base:
     tourism_events:
       file_path: "/Users/yunwu/MEP/wt/mt-tourism/resources/mock-data/mt_guest_event.parquet"
     tourism_report:
-      template_path: "/Users/yunwu/MEP/custom-workflows/mara-triangle/data/tourism_template.docx"
+      template_path: "/Users/yunwu/MEP/wt/mt-tourism/resources/templates/mt_tourism_report_template.docx"
