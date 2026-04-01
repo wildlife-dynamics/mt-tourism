@@ -11,22 +11,22 @@ setup:
 
 tasks:
   - name: Guest entry pipeline (filter → mt_guest_entry → summarize → pivot → bar charts)
-    status: pending
+    status: completed
     type: implement
   - name: Vehicle entry pipeline (filter → bar chart)
-    status: pending
+    status: completed
     type: implement
   - name: Dashboard widgets (3 charts + 1 table)
-    status: pending
+    status: completed
     type: implement
   - name: Data export (guest summary CSV)
-    status: pending
+    status: completed
     type: implement
   - name: DOCX report (3 chart images + summary table)
-    status: pending
+    status: completed
     type: implement
   - name: Configure rjsf
-    status: pending
+    status: in-progress
     type: configure
   - name: Configure layout
     status: pending

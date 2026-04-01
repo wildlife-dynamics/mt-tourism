@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -61,46 +60,6 @@ class TimezoneInfo(BaseModel):
     utc: str = Field(..., title="Utc")
 
 
-class Aggregator(str, Enum):
-    sum = "sum"
-    count_ = "count"
-    min = "min"
-    max = "max"
-    mean = "mean"
-    unique = "unique"
-    nunique = "nunique"
-    median = "median"
-    night_day_ratio = "night_day_ratio"
-
-
-class Unit(str, Enum):
-    m = "m"
-    km = "km"
-    s = "s"
-    h = "h"
-    d = "d"
-    m_s = "m/s"
-    km_h = "km/h"
-
-
-class AggFunc(str, Enum):
-    sum = "sum"
-    count_ = "count"
-    min = "min"
-    max = "max"
-    mean = "mean"
-    unique = "unique"
-    nunique = "nunique"
-    median = "median"
-    night_day_ratio = "night_day_ratio"
-
-
-class PlotCategoryStyle(BaseModel):
-    marker_color: str | None = Field(None, title="Marker Color")
-    textposition: str | None = Field(None, title="Textposition")
-    texttemplate: str | None = Field(None, title="Texttemplate")
-
-
 class TimeRange(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -108,73 +67,6 @@ class TimeRange(BaseModel):
     since: datetime = Field(..., description="The start time", title="Since")
     until: datetime = Field(..., description="The end time", title="Until")
     timezone: TimezoneInfo | None = Field(None, title="Timezone")
-
-
-class SummaryParam(BaseModel):
-    display_name: str = Field(..., title="Display Name")
-    aggregator: Aggregator = Field(..., title="Aggregator")
-    column: str | None = Field(None, title="Column")
-    original_unit: Unit | None = Field(None, title="Original Unit")
-    new_unit: Unit | None = Field(None, title="New Unit")
-    decimal_places: int | None = Field(2, title="Decimal Places")
-
-
-class BarConfig(BaseModel):
-    column: str = Field(
-        ..., description="The dataframe column to aggregate.", title="Column"
-    )
-    agg_func: AggFunc = Field(
-        ..., description="The aggregate function to apply.", title="Agg Func"
-    )
-    label: str = Field(
-        ..., description="The label for the bar in the chart legend.", title="Label"
-    )
-    show_label: bool | None = Field(
-        False,
-        description="Whether to show the value label on top of the bar.",
-        title="Show Label",
-    )
-    style: PlotCategoryStyle | None = Field(
-        None, description="The style parameters for the category", title="Style"
-    )
-
-
-class GuestSummary(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    summary_params: list[SummaryParam] = Field(
-        ...,
-        description="The parameters that define how to calculate summary statistics.",
-        title="Summary Params",
-    )
-
-
-class GuestGroupBar(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    bar_chart_configs: list[BarConfig] = Field(
-        ..., description="Bar chart configuration.", title="Bar Chart Configuration"
-    )
-
-
-class GuestGateBar(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    bar_chart_configs: list[BarConfig] = Field(
-        ..., description="Bar chart configuration.", title="Bar Chart Configuration"
-    )
-
-
-class VehicleGateBar(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    bar_chart_configs: list[BarConfig] = Field(
-        ..., description="Bar chart configuration.", title="Bar Chart Configuration"
-    )
 
 
 class Params(BaseModel):
@@ -190,15 +82,5 @@ class Params(BaseModel):
         None, description="Choose the period of time to analyze.", title="Time Range"
     )
     tourism_events: TourismEvents | None = Field(None, title="Load Tourism Events")
-    guest_summary: GuestSummary | None = Field(None, title="Summarize Guest Entry")
-    guest_group_bar: GuestGroupBar | None = Field(
-        None, title="Draw Guest Entry by Group Chart"
-    )
-    guest_gate_bar: GuestGateBar | None = Field(
-        None, title="Draw Guest Entry by Gate Chart"
-    )
-    vehicle_gate_bar: VehicleGateBar | None = Field(
-        None, title="Draw Vehicle Entry by Gate Chart"
-    )
     guest_table: GuestTable | None = Field(None, title="Draw Guest Summary Table")
     tourism_report: TourismReport | None = Field(None, title="Create Tourism Report")

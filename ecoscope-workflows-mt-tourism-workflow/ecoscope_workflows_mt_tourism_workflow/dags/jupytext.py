@@ -239,9 +239,7 @@ guest_entry_data = (
 # %%
 # parameters
 
-guest_summary_params = dict(
-    summary_params=...,
-)
+guest_summary_params = dict()
 
 # %%
 # call the task
@@ -262,6 +260,32 @@ guest_summary = (
         df=guest_entry_data,
         groupby_cols=["guest_group"],
         reset_index=True,
+        summary_params=[
+            {
+                "display_name": "Non Resident Adults",
+                "aggregator": "sum",
+                "column": "nra",
+            },
+            {
+                "display_name": "Non Resident Children",
+                "aggregator": "sum",
+                "column": "nrc",
+            },
+            {
+                "display_name": "Non Resident Students",
+                "aggregator": "sum",
+                "column": "nrs",
+            },
+            {"display_name": "Citizen Adults", "aggregator": "sum", "column": "ca"},
+            {"display_name": "Citizen Children", "aggregator": "sum", "column": "cc"},
+            {"display_name": "Citizen Students", "aggregator": "sum", "column": "cs"},
+            {"display_name": "Resident Adults", "aggregator": "sum", "column": "ra"},
+            {"display_name": "Resident Children", "aggregator": "sum", "column": "rc"},
+            {"display_name": "Resident Students", "aggregator": "sum", "column": "rs"},
+            {"display_name": "Narok Adults", "aggregator": "sum", "column": "na"},
+            {"display_name": "Narok Children", "aggregator": "sum", "column": "nc"},
+            {"display_name": "Narok Students", "aggregator": "sum", "column": "ns"},
+        ],
         **guest_summary_params,
     )
     .call()
@@ -303,7 +327,6 @@ guest_pivot = (
 # parameters
 
 guest_group_bar_params = dict(
-    bar_chart_configs=...,
     widget_id=...,
 )
 
@@ -326,6 +349,52 @@ guest_group_bar = (
         dataframe=guest_summary,
         category="guest_group",
         layout_kwargs=None,
+        bar_chart_configs=[
+            {
+                "column": "Non Resident Adults",
+                "agg_func": "sum",
+                "label": "Non Resident Adults",
+            },
+            {
+                "column": "Non Resident Children",
+                "agg_func": "sum",
+                "label": "Non Resident Children",
+            },
+            {
+                "column": "Non Resident Students",
+                "agg_func": "sum",
+                "label": "Non Resident Students",
+            },
+            {
+                "column": "Resident Adults",
+                "agg_func": "sum",
+                "label": "Resident Adults",
+            },
+            {
+                "column": "Resident Children",
+                "agg_func": "sum",
+                "label": "Resident Children",
+            },
+            {
+                "column": "Resident Students",
+                "agg_func": "sum",
+                "label": "Resident Students",
+            },
+            {"column": "Citizen Adults", "agg_func": "sum", "label": "Citizen Adults"},
+            {
+                "column": "Citizen Children",
+                "agg_func": "sum",
+                "label": "Citizen Children",
+            },
+            {
+                "column": "Citizen Students",
+                "agg_func": "sum",
+                "label": "Citizen Students",
+            },
+            {"column": "Narok Adults", "agg_func": "sum", "label": "Narok Adults"},
+            {"column": "Narok Children", "agg_func": "sum", "label": "Narok Children"},
+            {"column": "Narok Students", "agg_func": "sum", "label": "Narok Students"},
+        ],
         **guest_group_bar_params,
     )
     .call()
@@ -374,7 +443,6 @@ persist_guest_group_bar = (
 # parameters
 
 guest_gate_bar_params = dict(
-    bar_chart_configs=...,
     widget_id=...,
 )
 
@@ -397,6 +465,20 @@ guest_gate_bar = (
         dataframe=guest_pivot,
         category="gate",
         layout_kwargs=None,
+        bar_chart_configs=[
+            {
+                "column": "Paying Guests",
+                "agg_func": "sum",
+                "label": "Paying Guests",
+                "show_label": True,
+            },
+            {
+                "column": "Narok County Government(NCG) Guests",
+                "agg_func": "sum",
+                "label": "Narok County Government(NCG) Guests",
+                "show_label": True,
+            },
+        ],
         **guest_gate_bar_params,
     )
     .call()
@@ -478,7 +560,6 @@ filter_vehicle = (
 # parameters
 
 vehicle_gate_bar_params = dict(
-    bar_chart_configs=...,
     widget_id=...,
 )
 
@@ -501,6 +582,26 @@ vehicle_gate_bar = (
         dataframe=filter_vehicle,
         category="gate",
         layout_kwargs=None,
+        bar_chart_configs=[
+            {
+                "column": "paying",
+                "agg_func": "sum",
+                "label": "Paying Vehicles",
+                "show_label": True,
+            },
+            {
+                "column": "nonpaying",
+                "agg_func": "sum",
+                "label": "Non-Paying Vehicles",
+                "show_label": True,
+            },
+            {
+                "column": "sticker",
+                "agg_func": "sum",
+                "label": "Annual Sticker",
+                "show_label": True,
+            },
+        ],
         **vehicle_gate_bar_params,
     )
     .call()
