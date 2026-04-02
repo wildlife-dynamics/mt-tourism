@@ -16,4 +16,4 @@ integration:
       data_source:
         name: "mara"
     tourism_report:
-      template_path: "/Users/yunwu/MEP/wt/mt-tourism/resources/templates/mt_tourism_report_template.docx"
+      template_path: "https://raw.githubusercontent.com/wildlife-dynamics/mt-tourism/main/resources/templates/mt_tourism_report_template.docx"
