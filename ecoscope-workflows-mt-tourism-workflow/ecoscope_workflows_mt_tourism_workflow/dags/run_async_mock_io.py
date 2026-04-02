@@ -429,61 +429,109 @@ def main(params: Params):
                         "column": "Non Resident Adults",
                         "agg_func": "sum",
                         "label": "Non Resident Adults",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#35b779",
+                        },
                     },
                     {
                         "column": "Non Resident Children",
                         "agg_func": "sum",
                         "label": "Non Resident Children",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#35b779",
+                        },
                     },
                     {
                         "column": "Non Resident Students",
                         "agg_func": "sum",
                         "label": "Non Resident Students",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#35b779",
+                        },
                     },
                     {
                         "column": "Resident Adults",
                         "agg_func": "sum",
                         "label": "Resident Adults",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#31688e",
+                        },
                     },
                     {
                         "column": "Resident Children",
                         "agg_func": "sum",
                         "label": "Resident Children",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#31688e",
+                        },
                     },
                     {
                         "column": "Resident Students",
                         "agg_func": "sum",
                         "label": "Resident Students",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#31688e",
+                        },
                     },
                     {
                         "column": "Citizen Adults",
                         "agg_func": "sum",
                         "label": "Citizen Adults",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#35b779",
+                        },
                     },
                     {
                         "column": "Citizen Children",
                         "agg_func": "sum",
                         "label": "Citizen Children",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#35b779",
+                        },
                     },
                     {
                         "column": "Citizen Students",
                         "agg_func": "sum",
                         "label": "Citizen Students",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#35b779",
+                        },
                     },
                     {
                         "column": "Narok Adults",
                         "agg_func": "sum",
                         "label": "Narok Adults",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#31688e",
+                        },
                     },
                     {
                         "column": "Narok Children",
                         "agg_func": "sum",
                         "label": "Narok Children",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#31688e",
+                        },
                     },
                     {
                         "column": "Narok Students",
                         "agg_func": "sum",
                         "label": "Narok Students",
+                        "show_label": True,
+                        "style": {
+                            "marker_color": "#31688e",
+                        },
                     },
                 ],
             }
@@ -534,12 +582,18 @@ def main(params: Params):
                         "agg_func": "sum",
                         "label": "Paying Guests",
                         "show_label": True,
+                        "style": {
+                            "marker_color": "#35b779",
+                        },
                     },
                     {
                         "column": "Narok County Government(NCG) Guests",
                         "agg_func": "sum",
                         "label": "Narok County Government(NCG) Guests",
                         "show_label": True,
+                        "style": {
+                            "marker_color": "#31688e",
+                        },
                     },
                 ],
             }
@@ -613,18 +667,27 @@ def main(params: Params):
                         "agg_func": "sum",
                         "label": "Paying Vehicles",
                         "show_label": True,
+                        "style": {
+                            "marker_color": "#35b779",
+                        },
                     },
                     {
                         "column": "nonpaying",
                         "agg_func": "sum",
                         "label": "Non-Paying Vehicles",
                         "show_label": True,
+                        "style": {
+                            "marker_color": "#31688e",
+                        },
                     },
                     {
                         "column": "sticker",
                         "agg_func": "sum",
                         "label": "Annual Sticker",
                         "show_label": True,
+                        "style": {
+                            "marker_color": "#35b779",
+                        },
                     },
                 ],
             }
